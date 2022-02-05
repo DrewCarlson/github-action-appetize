@@ -1,20 +1,20 @@
 # Upload app to Appetize action
 
-This action upload an built app to Appetize.io.
+Upload or delete applications on [Appetize.io](https://appetize.io).
 
 ## Inputs
 
 | key            | description                                                          | required |
 | -------------- | -------------------------------------------------------------------- | -------- |
-| APPETIZE_TOKEN | Appetize api token.                                                  | o        |
-| PUBLIC_KEY     | App public key. If it's empty, a new app will be created.            | x        |
+| APPETIZE_TOKEN | Appetize API token.                                                  | o        |
+| PUBLIC_KEY     | App public key. If empty, a new app will be created.                 | x        |
 | FILE_URL       | Url or local file path of your app binary.                           | o        |
 | APPETIZE_TOKEN | Platform of the app (ios or android).                                | o        |
 | ACTION         | Leave blank to upload or 'delete' to delete the app at `PUBLIC_KEY`. | o        |
 
 ## Example usage
 
-For security, It is strongly recommended to use secrets for Appetize api token.
+For security, it is strongly recommended to use secrets for `APPETIZE_TOKEN`.
 
 To upload an app:
 
