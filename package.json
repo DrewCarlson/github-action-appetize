@@ -1,20 +1,21 @@
 {
-    "name": "github-action-appetize",
-    "description": "Upload app to appetize",
-    "version": "1.0.0",
-    "main": "dist/index.js",
-    "license": "MIT",
-    "repository": "https://github.com/JongtaekChoi/github-action-appetize",
-    "author": "Jongtaek Choi <lastchoice86@naver.com>",
-    "scripts": {
-        "build": "ncc build index.js -o dist --source-map"
-    },
-    "dependencies": {
-        "@actions/core": "1.2.6",
-        "form-data": "^4.0.0",
-        "axios": "0.25.0"
-    },
-    "devDependencies": {
-        "@vercel/ncc": "0.33.1"
-    }
+  "name": "github-action-appetize",
+  "description": "Upload app to appetize",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "repository": "https://github.com/DrewCarlson/github-action-appetize",
+  "author": "Jongtaek Choi <lastchoice86@naver.com>",
+  "scripts": {
+    "build": "ncc build index.js -o dist --source-map"
+  },
+  "dependencies": {
+    "@actions/core": "1.2.6",
+    "axios": "0.25.0",
+    "form-data": "^4.0.0"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "0.33.1",
+    "prettier": "2.5.1"
+  }
 }

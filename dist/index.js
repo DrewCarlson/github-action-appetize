@@ -5101,48 +5101,87 @@ module.exports = JSON.parse('{"application/1d-interleaved-parityfec":{"source":"
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-const core = __nccwpck_require__(2186);
-const axios = __nccwpck_require__(6545);
-const fs = __nccwpck_require__(7147);
-const FormData = __nccwpck_require__(4334);
+const core = __nccwpck_require__(2186)
+const axios = __nccwpck_require__(6545)
+const fs = __nccwpck_require__(7147)
+const FormData = __nccwpck_require__(4334)
 
 const baseUrl = 'https://TOKEN@api.appetize.io/v1/apps'
 
 const uploadToAppetize = (input) => {
-  const { token, publicKey, fileUrl, platform } = input;
-  const postfix = (publicKey && publicKey.length > 0) ? `/${publicKey}` : ``;
-  const url = `${baseUrl.replace('TOKEN', token)}${postfix}`;
-  const stream = fs.createReadStream(fileUrl);
-  const formData = new FormData();
-  formData.append('platform', platform);
-  formData.append('file', stream);
-  axios.post(url, formData, {
-    'maxBodyLength': Infinity,
-    headers: Object.assign({ Accept: 'application/json, text/plain, */*' }, formData.getHeaders())
-  }).then(response => {
+  const { token, publicKey, fileUrl, platform } = input
+  const postfix = publicKey && publicKey.length > 0 ? `/${publicKey}` : ``
+  const url = `${baseUrl.replace('TOKEN', token)}${postfix}`
+  var body
+  var headers = { Accept: 'application/json, text/plain, */*' }
+  if (fileUrl.startsWith('http')) {
+    body = { url: fileUrl, platform: platform }
+    headers = Object.assign(headers, { 'Content-Type': 'application/json' })
+  } else {
+    const stream = fs.createReadStream(fileUrl)
+    const formData = new FormData()
+    formData.append('platform', platform)
+    formData.append('file', stream)
+    body = formData
+    headers = Object.assign(headers, formData.getHeaders())
+  }
+  axios
+    .post(url, body, { maxBodyLength: Infinity, headers: headers })
+    .then((response) => {
       if (response.status == 200) {
         console.log('Success')
         core.setOutput('appetize_public_key', response.data.publicKey)
       } else {
-        response.text().then(text => console.error({ 'error': text }));
-        throw new Error(`RequestError (${response.status}) : ${response.statusText}`);
+        response.text().then((text) => console.error({ error: text }))
+        throw new Error(
+          `RequestError (${response.status}) : ${response.statusText}`
+        )
       }
-    }).catch(error => {
-      console.error(error.message);
-      core.setFailed(error.message);
-    });
-};
-
-try {
-  const token = core.getInput('APPETIZE_TOKEN');
-  const publicKey = core.getInput('PUBLICKEY');
-  const fileUrl = core.getInput('FILE_URL');
-  const platform = core.getInput('PLATFORM');
-  uploadToAppetize({ token, publicKey, fileUrl, platform });
-} catch (error) {
-  core.setFailed(error.message);
+    })
+    .catch((error) => {
+      console.error(error.message)
+      core.setFailed(error.message)
+    })
 }
 
+const deleteFromAppetize = (input) => {
+  if (publicKey && publicKey.length > 0) {
+    const url = `${baseUrl.replace('TOKEN', token)}/${publicKey}`
+    axios
+      .delete(url)
+      .then((response) => {
+        if (response.status == 200) {
+          console.log('Success')
+          core.setOutput('appetize_public_key', publicKey)
+        } else {
+          throw new Error(
+            `Failed to delete '${publicKey}': ${response.status} ${response.statusText}`
+          )
+        }
+      })
+      .catch((error) => {
+        console.error(error.message)
+        core.setFailed(error.message)
+      })
+  } else {
+    throw new Error('PUBLIC_KEY must contain a valid public key')
+  }
+}
+
+try {
+  const token = core.getInput('APPETIZE_TOKEN')
+  const publicKey = core.getInput('PUBLIC_KEY')
+  const fileUrl = core.getInput('FILE_URL')
+  const platform = core.getInput('PLATFORM')
+  const action = core.getInput('ACTION')
+  if (action && action.toLowerCase() == 'delete') {
+    deleteFromAppetize({ token, publicKey })
+  } else {
+    uploadToAppetize({ token, publicKey, fileUrl, platform })
+  }
+} catch (error) {
+  core.setFailed(error.message)
+}
 
 })();
 
